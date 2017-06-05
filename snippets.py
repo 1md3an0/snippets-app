@@ -1,5 +1,6 @@
 import logging
 import argparse
+import psycopg2
 
 # Set the log output file, and the log level
 logging.basicConfig(filename="snippets.log", level=logging.DEBUG)
@@ -22,8 +23,8 @@ def put(name, snippet):
     with connection, connection.cursor() as cursor:
         try:
             cursor.execute("insert into snippets values (%s, %s, %s)",
-                (name, snippet, hide)
-        except psycopg2.IntegrityError:            
+                (name, snippet, hide))
+        except psycopg2.IntegrityError:
             connection.rollback()
             cursor.execute("update snippets set message=%s,hidden=%s where keyword=%s",
                            (snippet, hidden, name))
@@ -46,7 +47,7 @@ def get(name):
 
     if not row: #no snippet found with name
         logging.debug("snippet doesn't exist")
-        return "ERROR: snippet with {} name does not exist").format(name)
+        return "ERROR: snippet with {} name does not exist".format(name)
     else:
         logging.debug("snippet successfully retrieved")
         return row[0]
